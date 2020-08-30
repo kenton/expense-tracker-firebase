@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { GlobalContext } from  '../contexts/globalState';
 import { Transaction } from './transaction';
+import { AppContext } from '../app';
 
 export const TransactionList = () => {
-  const {transactions} = useContext(GlobalContext);
+  const {transactions} = useContext(AppContext);
   return (
     <>
       <h3>History</h3>

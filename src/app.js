@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState, createContext} from 'react';
 import './app.css';
 import {firestore} from './firebase';
 
@@ -8,21 +8,35 @@ import {IncomeExpense} from './components/incomeExpense';
 import {TransactionList} from './components/transactionList';
 import {AddTransaction} from './components/addTransaction';
 
-import { GlobalProvider } from './contexts/globalState';
+// create context
+export const AppContext = createContext({
+  transactions: [],
+  setTransactions: null
+});
 
 function App() {
+  const [transactions, setTransactions] = useState([]);
+
   useEffect(() => {
     async function fetchTransactions() {
       const snapshot = await firestore.collection('transactions').get();
-      const data = snapshot.docs.map(doc => doc.data());
-      console.log(data);
+
+      const transactions = snapshot.docs.map(doc => {
+        return { id: doc.id, ...doc.data() };
+      });
+
+      setTransactions(transactions);
+      console.log(transactions);
     }
 
     fetchTransactions();
-  }, []);
+  }, [transactions]);
 
   return (
-    <GlobalProvider>
+    <AppContext.Provider value={{
+      transactions,
+      setTransactions
+    }}>
       <Header />
       <div className="container">
         <Balance />
@@ -30,7 +44,7 @@ function App() {
         <TransactionList />
         <AddTransaction />
       </div>
-    </GlobalProvider>
+    </AppContext.Provider>
   );
 }
 
