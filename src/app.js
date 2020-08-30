@@ -7,8 +7,8 @@ import {Balance} from './components/balance';
 import {IncomeExpense} from './components/incomeExpense';
 import {TransactionList} from './components/transactionList';
 import {AddTransaction} from './components/addTransaction';
+import { collectIdsAndDocs } from './utils';
 
-// create context
 export const AppContext = createContext({
   transactions: [],
   setTransactions: null
@@ -21,9 +21,7 @@ function App() {
     async function fetchTransactions() {
       const snapshot = await firestore.collection('transactions').get();
 
-      const transactions = snapshot.docs.map(doc => {
-        return { id: doc.id, ...doc.data() };
-      });
+      const transactions = snapshot.docs.map(collectIdsAndDocs);
 
       setTransactions(transactions);
       console.log(transactions);

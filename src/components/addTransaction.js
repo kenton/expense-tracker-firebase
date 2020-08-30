@@ -1,17 +1,35 @@
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import { AppContext } from '../app';
+import { firestore } from '../firebase';
+import { collectIdsAndDocs } from '../utils';
 
 export const AddTransaction = () => {
-  const [text, setText] = useState("");
+  const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
-  const { addTransaction } = useContext(AppContext);
+  const { transactions, setTransactions } = useContext(AppContext);
+
+  // useEffect(() => {
+  //   setDescription("");
+  //   setAmount(0);
+  //   debugger;
+
+  // }, [transactions]);
+
+  const addTransaction = async transaction => {
+    const docRef = await firestore.collection('transactions').add(transaction);
+    const doc = await docRef.get();
+    const newTransaction = collectIdsAndDocs(doc);
+
+    setTransactions([newTransaction, ...transactions]);
+    setDescription("");
+    setAmount(0);
+  }
 
   const onSubmit = e => {
     e.preventDefault();
 
     const newTransaction = {
-      id: Math.floor(Math.random() * 100000000),
-      text,
+      description,
       amount: +amount
     }
 
@@ -23,8 +41,8 @@ export const AddTransaction = () => {
       <h3>Add new transaction</h3>
       <form onSubmit={onSubmit}>
         <div className="form-control">
-          <label htmlFor="text">Text</label>
-          <input type="text" value={text} onChange={(e) => {setText(e.target.value)}} id="text" placeholder="Enter text..." />
+          <label htmlFor="description">Text</label>
+          <input type="description" value={description} onChange={(e) => {setDescription(e.target.value)}} id="description" placeholder="Enter description..." />
         </div>
         <div className="form-control">
           <label htmlFor="amount">
