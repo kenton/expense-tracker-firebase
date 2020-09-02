@@ -1,14 +1,11 @@
-import React, { useContext } from 'react';
-import { AppContext } from '../app';
+import React from 'react';
 import { firestore } from '../firebase';
 
 export const Transaction = ({transaction}) => {
-  const { transactions, setTransactions } = useContext(AppContext);
+  const transactionDoc = firestore.collection('transactions').doc(transaction.id);
 
-  const deleteTransaction = async transactionId => {
-    setTransactions(transactions.filter(transaction => transaction.id !== transactionId));
-    await firestore.collection('transactions').doc(transactionId).delete();
-  }
+  const deleteTransaction = () => transactionDoc.delete();
+
 
   const sign = transaction.amount < 0 ? '-' : '+';
   const transactionClass = transaction.amount < 0 ? 'minus' : 'plus';
