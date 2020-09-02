@@ -8,6 +8,8 @@
     "@testing-library/user-event": "^7.1.2",
     "firebase": "^7.19.0",
     "firebase-tools": "^8.9.0",
+    "moment": "^2.27.0",
+    "prettier": "^2.1.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
