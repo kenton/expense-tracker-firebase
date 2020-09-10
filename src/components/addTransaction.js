@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { firestore } from "../firebase";
+import { AppContext } from "../app";
 
 export const AddTransaction = () => {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState(0);
+  const { currentUser } = useContext(AppContext);
 
   // FIXME: Consider renaming this as it's confusing since this component has the same name
   const addTransaction = async (transaction) => {
@@ -17,9 +19,16 @@ export const AddTransaction = () => {
   const onSubmit = (e) => {
     e.preventDefault();
 
+    const { uid, displayName, email, photoUrl } = currentUser;
+
     const newTransaction = {
       description,
       amount: +amount,
+      user: {
+        id: uid,
+        name: displayName,
+        email,
+      },
     };
 
     addTransaction(newTransaction);

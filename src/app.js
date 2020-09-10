@@ -13,6 +13,7 @@ import { Authentication } from "./components/authentication/";
 export const AppContext = createContext({
   transactions: [],
   setTransactions: null,
+  currentUser: null,
 });
 
 function App() {
@@ -31,24 +32,38 @@ function App() {
 
   useEffect(() => {
     let firestoreUnsubscribe;
+    let fetchTransactions;
 
-    async function fetchTransactions() {
-      firestoreUnsubscribe = await firestore.collection("transactions").onSnapshot((snapshot) => {
-        const allTransactions = snapshot.docs.map(collectIdsAndDocs);
-        setTransactions(allTransactions);
-      });
+    if (currentUser) {
+      fetchTransactions = async () => {
+        firestoreUnsubscribe = await firestore
+          .collection("transactions")
+          .where("user.id", "==", currentUser.uid)
+          .onSnapshot((snapshot) => {
+            const allTransactions = snapshot.docs.map(collectIdsAndDocs);
+            setTransactions(allTransactions);
+          });
+      };
+    } else {
+      fetchTransactions = async () => {
+        firestoreUnsubscribe = await firestore.collection("transactions").onSnapshot((snapshot) => {
+          const allTransactions = snapshot.docs.map(collectIdsAndDocs);
+          setTransactions(allTransactions);
+        });
+      };
     }
 
     fetchTransactions();
 
     return () => firestoreUnsubscribe();
-  }, [transactions]);
+  }, [transactions, currentUser]);
 
   return (
     <AppContext.Provider
       value={{
         transactions,
         setTransactions,
+        currentUser,
       }}
     >
       <Header />
